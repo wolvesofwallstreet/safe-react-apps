@@ -1,0 +1,6 @@
+{
+  "short_name": "Raw Multi Tx",
+  "name": "Raw Multi Transaction Sender",
+  "description": "A Safe app to send multiple raw transactions",
+  "iconPath": "logo.png"
+}
