@@ -1,18 +1,17 @@
 {
   "name": "wallet-connect",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "homepage": "./",
   "dependencies": {
-    "@ethersproject/abi": "^5.0.13",
-    "@gnosis.pm/safe-react-components": "^0.5.0",
-    "@walletconnect/client": "^1.3.6",
-    "date-fns": "^2.17.0",
+    "@gnosis.pm/safe-react-components": "^0.6.0",
+    "@walletconnect/client": "^1.5.2",
+    "date-fns": "^2.24.0",
     "jsqr": "^1.3.1"
   },
   "scripts": {
-    "start": "dotenv -e .env -- react-app-rewired start",
-    "build": "dotenv -e .env -- react-app-rewired build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "test": "react-app-rewired test --passWithNoTests"
   },
   "eslintConfig": {

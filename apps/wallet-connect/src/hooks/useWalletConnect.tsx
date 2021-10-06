@@ -2,8 +2,6 @@ import { useState, useCallback, useEffect } from 'react';
 import WalletConnect from '@walletconnect/client';
 import { IClientMeta } from '@walletconnect/types';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { chainIdByNetwork } from '../utils/networks';
-import { encodeSignMessageCall } from '../utils/signatures';
 import { isMetaTxArray } from '../utils/transactions';
 import { areStringsEqual } from '../utils/strings';
 
@@ -27,8 +25,6 @@ const useWalletConnect = () => {
 
   const wcConnect = useCallback(
     async (uri: string) => {
-      const network = safe.network;
-
       const wcConnector = new WalletConnect({ uri });
       setConnector(wcConnector);
       setWcClientData(wcConnector.peerMeta);
@@ -41,7 +37,7 @@ const useWalletConnect = () => {
 
         wcConnector.approveSession({
           accounts: [safe.safeAddress],
-          chainId: chainIdByNetwork[network],
+          chainId: safe.chainId,
         });
 
         setWcClientData(payload.params[0].peerMeta);
@@ -90,6 +86,19 @@ const useWalletConnect = () => {
               break;
             }
 
+            case 'personal_sign': {
+              const [message, address] = payload.params;
+
+              if (!areStringsEqual(address, safe.safeAddress)) {
+                throw new Error('The address or message hash is invalid');
+              }
+
+              await sdk.txs.signMessage(message);
+
+              result = '0x';
+              break;
+            }
+
             case 'eth_sign': {
               const [address, messageHash] = payload.params;
 
@@ -97,16 +106,9 @@ const useWalletConnect = () => {
                 throw new Error('The address or message hash is invalid');
               }
 
-              const callData = encodeSignMessageCall(messageHash);
-              await sdk.txs.send({
-                txs: [
-                  {
-                    to: safe.safeAddress,
-                    value: '0x0',
-                    data: callData,
-                  },
-                ],
-              });
+              await sdk.txs.signMessage(messageHash);
+
+              result = '0x';
               break;
             }
             default: {
@@ -120,7 +122,7 @@ const useWalletConnect = () => {
             result,
           });
         } catch (err) {
-          rejectWithMessage(wcConnector, payload.id, err.message);
+          rejectWithMessage(wcConnector, payload.id, (err as Error).message);
         }
       });
 

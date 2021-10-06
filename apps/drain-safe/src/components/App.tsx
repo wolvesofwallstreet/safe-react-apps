@@ -16,7 +16,7 @@ const App: React.FC = () => {
   const { sdk, safe } = useSafeAppsSDK();
   const { assets, error: balancesError }: { assets: Asset[]; error?: Error } = useBalances(
     safe.safeAddress,
-    safe.network,
+    safe.chainId,
   );
   const [emptyAssets, setEmptyAssets] = useState<Asset[] | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +53,7 @@ const App: React.FC = () => {
       await sendTxs();
     } catch (e) {
       setSubmitting(false);
-      onError('Failed sending transactions', e);
+      onError('Failed sending transactions', e as Error);
       return;
     }
 
